@@ -11,9 +11,6 @@ function App() {
 
   const [user, setUser] = useState<User | undefined | null>(null);
 
-  const checkAndUpdateUser = () =>
-    supabase.auth.getSession().then((session) => setUser(session.data.session?.user));
-
   const login = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -21,7 +18,6 @@ function App() {
     if (error) {
       return <div>Error Signing In</div>;
     }
-    checkAndUpdateUser();
   };
 
   const logout = async () => {
@@ -29,11 +25,24 @@ function App() {
     if (error) {
       return <div>Error signing out</div>;
     }
-    checkAndUpdateUser();
   };
 
   useEffect(() => {
-    checkAndUpdateUser();
+    supabase.auth.getSession().then((res) => setUser(res.data.session?.user));
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      switch (event) {
+        case 'SIGNED_IN':
+          supabase.auth.getUser().then((res) => setUser(res.data.user));
+          break;
+        case 'SIGNED_OUT':
+          setUser(null);
+          break;
+        default:
+      }
+    });
+
+    return () => authListener.subscription.unsubscribe();
   }, []);
 
   return (
