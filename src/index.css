@@ -19,10 +19,21 @@ body {
   background: var(--bgClr);
   color: var(--textClr);
 
-  padding: 2rem;
+  padding: .5rem 2rem;
 
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+a {
+  text-decoration: underline;
+  text-underline-offset: .4rem;
+  text-decoration-thickness: .15rem;
+  color: inherit;
+}
+
+a:hover {
+  color: royalblue;
 }

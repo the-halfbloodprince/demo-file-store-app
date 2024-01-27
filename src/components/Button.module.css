@@ -1,0 +1,16 @@
+.button {
+  height: fit-content;
+  padding: .5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--textClr);
+  color: var(--bgClr);
+  border-radius: 10px;
+  transition: all .3s ease;
+}
+
+.button:hover {
+  background: white;
+  color: var(--bgClr);
+}

@@ -1,0 +1,15 @@
+.collapsible {
+
+  --collBgClr: #333;
+
+  background: var(--collBgClr);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+
+  word-wrap: break-word;
+}
+
+.collapsible > summary {
+  margin-bottom: .7rem;
+}
