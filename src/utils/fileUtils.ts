@@ -15,7 +15,7 @@ export const fetchFiles = async () => {
 };
 
 // get the s3 object key for a file
-export const getS3FileName = (fileName: string, user: User) => `${user.id}.+.${fileName}`;
+export const getS3FileName = (fileName: string, user: User) => `${user.id}.-.${fileName}`;
 
 // get s3 url for a file
 export const getS3Url = (fileName: string, user: User) =>
@@ -61,3 +61,12 @@ export const uploadFile = async (
     console.error(err);
   }
 };
+
+// delete file
+export const deleteFile = async (fileName: string) => {
+  await deleteFileFromS3();
+  await deleteFileFromDB();
+};
+
+const deleteFileFromS3 = () => console.log('Delete file from s3 yet to be implemented');
+const deleteFileFromDB = () => console.log('Delete file from DB yet to be implemented');

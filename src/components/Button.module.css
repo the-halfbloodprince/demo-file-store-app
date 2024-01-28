@@ -11,10 +11,10 @@
   transition: all .3s ease;
 }
 
-.button:hover {
-  background: white;
-  color: var(--bgClr);
-}
+/* .button:hover {
+  translate: -.15rem -.15rem;
+  box-shadow: .15rem .15rem royalblue;
+} */
 
 .button:disabled {
   background: #444;

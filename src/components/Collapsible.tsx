@@ -10,7 +10,9 @@ type Props = {
 const Collapsible: FC<Props> = ({ summary, content }) => {
   return (
     <details className={styles.collapsible}>
-      <summary>{summary}</summary>
+      <summary>
+        Expand to view <span className={styles.summary}>{summary}</span>
+      </summary>
       <code>{content}</code>
     </details>
   );

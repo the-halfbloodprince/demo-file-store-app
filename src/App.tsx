@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import styles from './App.module.css';
 import Button from './components/Button';
 import Collapsible from './components/Collapsible';
-import FileRow from './components/File';
+import YourFiles from './components/YourFiles';
 import { services } from './config/services';
 import { userContext } from './contexts/UserContext';
 import FileDetails from './types/schema/FileDetails';
@@ -114,26 +114,22 @@ function App() {
         <main>
           {user ? (
             <div>
-              <h3 className={styles.authMsg} data-loggedIn={true}>
-                logged in as {user.user_metadata.full_name} ({user.email})
-              </h3>
-              <Collapsible summary="User Details" content={JSON.stringify(user)} />
+              <section className={styles.sec2}>
+                <h3 className={styles.authMsg} data-loggedIn={true}>
+                  logged in as {user.user_metadata.full_name} ({user.email})
+                </h3>
+                <Collapsible summary="User Details" content={JSON.stringify(user)} />
 
-              <div>
-                <input type="file" name="file" onChange={handleFileSelect} />
-                <Button onClick={upload} disabled={uploadMsg}>
-                  {uploadMsg ? uploadMsg : 'Upload File'}
-                </Button>
-              </div>
-
-              <div className={styles.filesHeader}>
-                <h3>Your Files</h3>
-              </div>
-              <div className={styles.filesList}>
-                {files?.map((file, idx) => (
-                  <FileRow fileDetails={file} key={idx} />
-                ))}
-              </div>
+                <div>
+                  <input type="file" name="file" onChange={handleFileSelect} />
+                  <Button onClick={upload} disabled={uploadMsg}>
+                    {uploadMsg ? uploadMsg : 'Upload File'}
+                  </Button>
+                </div>
+              </section>
+              <section>
+                <YourFiles files={files || []} />
+              </section>
             </div>
           ) : (
             <div>

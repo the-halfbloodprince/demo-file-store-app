@@ -2,6 +2,12 @@ h1 {
   font-size: 1.8rem;
 }
 
+.sec2 {
+  border: 3px solid #fff;
+  padding: .8rem;
+  border-radius: 10px;
+}
+
 .filesList {
   display: flex;
   flex-direction: column;
@@ -18,6 +24,10 @@ h1 {
 
 .filesHeader {
   font-size: 1.2rem;
+  margin: 0;
+}
+
+.authMsg {
   margin: 0;
 }
 

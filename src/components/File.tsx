@@ -1,16 +1,21 @@
+import path from 'path-browserify';
 import React, { FC, useContext } from 'react';
+import { FaEye } from 'react-icons/fa';
+import { FaLink } from 'react-icons/fa6';
+import { MdDeleteForever } from 'react-icons/md';
 
 import { userContext } from '../contexts/UserContext';
-import { getS3Url } from '../utils/fileUtils';
+import { deleteFile, getS3Url } from '../utils/fileUtils';
 import styles from './File.module.css';
 
 type FileDetails = any;
 
 type Props = {
   fileDetails: FileDetails;
+  onClick: () => void;
 };
 
-const FileRow: FC<Props> = ({ fileDetails }) => {
+const FileRow: FC<Props> = ({ fileDetails, onClick }) => {
   const user = useContext(userContext);
 
   if (!user) return null;
@@ -19,9 +24,21 @@ const FileRow: FC<Props> = ({ fileDetails }) => {
 
   return (
     <li className={styles.file}>
-      <a href={fileURL} target="_blank" rel="noreferrer">
-        {fileDetails.file_name}
-      </a>
+      <p>{fileDetails.file_name}</p>
+      <div className={styles.buttons}>
+        <button className={styles.smallButton} onClick={onClick}>
+          <FaEye />
+        </button>
+        <a className={styles.smallButton} href={fileURL} target="_blank" rel="noreferrer">
+          <FaLink />
+        </a>
+        <button
+          className={styles.smallButton}
+          onClick={() => deleteFile(fileDetails.file_name)}
+        >
+          <MdDeleteForever color="red" />
+        </button>
+      </div>
     </li>
   );
 };

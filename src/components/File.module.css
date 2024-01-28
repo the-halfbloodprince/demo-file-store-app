@@ -1,3 +1,28 @@
 .file {
-  font-size: 1.2rem;
+  font-size: 1rem;
+}
+
+.file p {
+  display: inline-block;
+  margin: 0;
+  margin-right: .7rem;
+}
+
+.buttons {
+  display: inline-flex;
+  gap: .4rem;
+  justify-content: baseline;
+  align-items: center;
+}
+
+.smallButton {
+  padding: 0;
+  background: transparent;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  text-decoration-thickness: 0;
+  font-size: inherit;
 }
