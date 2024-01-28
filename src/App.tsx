@@ -114,7 +114,7 @@ function App() {
         <main>
           {user ? (
             <div>
-              <h3>
+              <h3 className={styles.authMsg} data-loggedIn={true}>
                 logged in as {user.user_metadata.full_name} ({user.email})
               </h3>
               <Collapsible summary="User Details" content={JSON.stringify(user)} />
@@ -136,7 +136,11 @@ function App() {
               </div>
             </div>
           ) : (
-            <div>Please log in to view your files</div>
+            <div>
+              <h3 className={styles.authMsg} data-loggedIn={false}>
+                Not logged in. Please log in to view your files
+              </h3>
+            </div>
           )}
         </main>
       </div>

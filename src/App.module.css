@@ -15,3 +15,16 @@ h1 {
   justify-content: space-between;
   align-items: center;
 }
+
+.filesHeader {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.authMsg[data-loggedIn=true] {
+  color: lime;
+}
+
+.authMsg[data-loggedIn=false] {
+  color: red;
+}
