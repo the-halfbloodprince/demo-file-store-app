@@ -1,16 +1,23 @@
 .button {
   height: fit-content;
-  padding: .5rem 1.2rem;
+  padding: .3rem .5rem;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--primaryFontFamily);
   cursor: pointer;
   background: var(--textClr);
   color: var(--bgClr);
-  border-radius: 10px;
+  border-radius: 6px;
   transition: all .3s ease;
 }
 
 .button:hover {
   background: white;
   color: var(--bgClr);
+}
+
+.button:disabled {
+  background: #444;
+  color: #aaa;
+  cursor: not-allowed;
 }

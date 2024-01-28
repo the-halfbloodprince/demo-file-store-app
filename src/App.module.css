@@ -5,7 +5,7 @@ h1 {
 .filesList {
   display: flex;
   flex-direction: column;
-  gap: .4rem;
+  gap: .8rem;
   padding: 0 1rem;
 }
 

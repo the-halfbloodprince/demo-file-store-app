@@ -1,6 +1,7 @@
 :root {
   --bgClr: #eee;
   --textClr: #111;
+  --primaryFontFamily: monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,7 +13,7 @@
 
 body {
   margin: 0;
-  font-family: monospace;
+  font-family: var(--primaryFontFamily);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
@@ -36,4 +37,21 @@ a {
 
 a:hover {
   color: royalblue;
+}
+
+input[type=file] {
+  margin-right: 3rem;
+}
+
+input[type=file]::file-selector-button {
+  height: fit-content;
+  padding: .3rem .5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--primaryFontFamily);
+  cursor: pointer;
+  background: var(--textClr);
+  color: var(--bgClr);
+  border-radius: 6px;
+  transition: all .3s ease;
 }

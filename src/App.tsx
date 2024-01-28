@@ -1,47 +1,24 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { createClient, User } from '@supabase/supabase-js';
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { User } from '@supabase/supabase-js';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import styles from './App.module.css';
 import Button from './components/Button';
 import Collapsible from './components/Collapsible';
 import FileRow from './components/File';
-import config from './config';
+import { services } from './config/services';
+import { userContext } from './contexts/UserContext';
 import FileDetails from './types/schema/FileDetails';
+import { fetchFiles, uploadFile } from './utils/fileUtils';
 
 function App() {
-  const supabase = useMemo(
-    () => createClient(config.supabase.publicURL, config.supabase.publicKey),
-    [],
-  );
-
-  const s3Client = new S3Client({
-    credentials: {
-      accessKeyId: config.aws.accessKeyID,
-      secretAccessKey: config.aws.secretAccessKey,
-      sessionToken: config.aws.sessionToken,
-    },
-    region: config.aws.region,
-  });
-
   const [user, setUser] = useState<User | undefined | null>(null);
   const [uploadMsg, setUploadMsg] = useState<string | null>(null);
   const [files, setFiles] = useState<FileDetails[] | null>([]);
 
-  // fetchFiles
-  const fetchFiles = useCallback(async () => {
-    const { data, error } = await supabase.from('files').select();
-    if (error) {
-      console.error('Error fetching file names');
-      console.error(error);
-    }
-    return data;
-  }, [user]);
-
   // login
   const login = async () => {
     console.log('login started');
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await services.supabase.auth.signInWithOAuth({
       provider: 'google',
     });
     if (error) {
@@ -52,7 +29,7 @@ function App() {
 
   // logout
   const logout = async () => {
-    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    const { error } = await services.supabase.auth.signOut({ scope: 'local' });
     if (error) {
       return <div>Error signing out</div>;
     }
@@ -60,19 +37,21 @@ function App() {
 
   // initial authentication
   useEffect(() => {
-    supabase.auth.getSession().then((res) => setUser(res.data.session?.user));
+    services.supabase.auth.getSession().then((res) => setUser(res.data.session?.user));
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      switch (event) {
-        case 'SIGNED_IN':
-          supabase.auth.getUser().then((res) => setUser(res.data.user));
-          break;
-        case 'SIGNED_OUT':
-          setUser(null);
-          break;
-        default:
-      }
-    });
+    const { data: authListener } = services.supabase.auth.onAuthStateChange(
+      (event, session) => {
+        switch (event) {
+          case 'SIGNED_IN':
+            services.supabase.auth.getUser().then((res) => setUser(res.data.user));
+            break;
+          case 'SIGNED_OUT':
+            setUser(null);
+            break;
+          default:
+        }
+      },
+    );
 
     return () => authListener.subscription.unsubscribe();
   }, []);
@@ -95,82 +74,73 @@ function App() {
     fileRef.current = file;
   };
 
-  const uploadFile = async () => {
-    console.log('Upload');
-    if (!fileRef.current || !user) return;
-    const file = fileRef.current;
-    const params = {
-      Bucket: import.meta.env.VITE_AWS_BUCKET,
-      Key: `${user.id}.+.${file.name}`,
-      Body: file,
-    };
-
-    try {
-      const putObjectCommand = new PutObjectCommand(params);
-      const res = await s3Client.send(putObjectCommand);
-      console.log(res);
-      console.log(`${file.name} uploaded to bucket`);
-      setUploadMsg('file uploaded (1/2)');
-      try {
-        await supabase.from('files').insert({
-          file_name: params.Key,
-        });
-        const files = await fetchFiles();
-        setFiles(files);
-        setUploadMsg('file saved');
-        // console.log()
-      } catch (err) {
-        console.error('Error saving entry to supabase (2/2)');
-        console.error(err);
-      }
-    } catch (err) {
-      console.error('Error uploading file');
-      console.error(err);
+  const upload = async () => {
+    if (!fileRef.current) {
+      console.error('No file selected');
+      return;
     }
+
+    if (!user) {
+      console.error('Not signed in');
+      return;
+    }
+
+    await uploadFile(fileRef.current, user, {
+      uploadedToBucketCallback: () => setUploadMsg('File Uploaded (1/2)'),
+      savedToDBCallback: () => setUploadMsg('File Saved to DB (2/2)'),
+    });
+
+    const newFiles = await fetchFiles();
+    setFiles(newFiles);
 
     setTimeout(() => setUploadMsg(null), 2000);
   };
 
   return (
-    <div className={styles.app}>
-      <nav className={styles.nav}>
-        <h1>Upload App</h1>
-        {user ? (
-          <Button onClick={logout}>Sign out</Button>
-        ) : (
-          <Button onClick={login}>Sign In</Button>
-        )}
-      </nav>
+    <userContext.Provider value={user}>
+      <div className={styles.app}>
+        <nav className={styles.nav}>
+          <h1>Upload App</h1>
+          {user ? (
+            <Button onClick={logout}>Sign out</Button>
+          ) : (
+            <Button onClick={login}>Sign In</Button>
+          )}
+        </nav>
 
-      {/* <Collapsible summary="Env Variables" content={JSON.stringify(import.meta.env)} /> */}
-      {/* <Collapsible summary="Config" content={JSON.stringify(import.meta.env)} /> */}
+        {/* <Collapsible summary="Env Variables" content={JSON.stringify(import.meta.env)} /> */}
+        {/* <Collapsible summary="Config" content={JSON.stringify(import.meta.env)} /> */}
 
-      <main>
-        {user ? (
-          <div>
-            <h3>{user.email} logged in</h3>
-            <Collapsible summary="User Details" content={JSON.stringify(user)} />
-
+        <main>
+          {user ? (
             <div>
-              {uploadMsg && uploadMsg}
-              <input type="file" name="file" onChange={handleFileSelect} />
-              <Button onClick={uploadFile}>Upload File</Button>
-            </div>
+              <h3>
+                logged in as {user.user_metadata.full_name} ({user.email})
+              </h3>
+              <Collapsible summary="User Details" content={JSON.stringify(user)} />
 
-            <div className={styles.filesHeader}>
-              <h3>Your Files</h3>
+              <div>
+                <input type="file" name="file" onChange={handleFileSelect} />
+                <Button onClick={upload} disabled={uploadMsg}>
+                  {uploadMsg ? uploadMsg : 'Upload File'}
+                </Button>
+              </div>
+
+              <div className={styles.filesHeader}>
+                <h3>Your Files</h3>
+              </div>
+              <div className={styles.filesList}>
+                {files?.map((file, idx) => (
+                  <FileRow fileDetails={file} key={idx} />
+                ))}
+              </div>
             </div>
-            <div className={styles.filesList}>
-              {files?.map((file, idx) => (
-                <FileRow fileDetails={file} key={idx} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div>Please log in to view your files</div>
-        )}
-      </main>
-    </div>
+          ) : (
+            <div>Please log in to view your files</div>
+          )}
+        </main>
+      </div>
+    </userContext.Provider>
   );
 }
 

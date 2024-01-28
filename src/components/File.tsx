@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 
-import config from '../config';
+import { userContext } from '../contexts/UserContext';
+import { getS3Url } from '../utils/fileUtils';
 
 type FileDetails = any;
 
@@ -9,7 +10,11 @@ type Props = {
 };
 
 const FileRow: FC<Props> = ({ fileDetails }) => {
-  const fileURL = `https://${config.aws.bucketName}.s3.${config.aws.region}.amazonaws.com/${fileDetails.file_name}`;
+  const user = useContext(userContext);
+
+  if (!user) return null;
+
+  const fileURL = getS3Url(fileDetails.file_name, user);
 
   return (
     <li>

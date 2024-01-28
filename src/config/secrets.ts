@@ -1,4 +1,4 @@
-const config = {
+export const secrets = {
   supabase: {
     publicURL: import.meta.env.VITE_SUPABASE_PROJECT_URL,
     publicKey: import.meta.env.VITE_SUPABASE_PUBLIC_KEY,
@@ -11,5 +11,3 @@ const config = {
     region: import.meta.env.VITE_AWS_REGION,
   },
 };
-
-export default config;
