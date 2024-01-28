@@ -22,6 +22,10 @@ const FileRow: FC<Props> = ({ fileDetails, onClick }) => {
 
   const fileURL = getS3Url(fileDetails.file_name, user);
 
+  const deleteF = () => {
+    deleteFile(fileDetails, user);
+  };
+
   return (
     <li className={styles.file}>
       <p>{fileDetails.file_name}</p>
@@ -32,12 +36,9 @@ const FileRow: FC<Props> = ({ fileDetails, onClick }) => {
         <a className={styles.smallButton} href={fileURL} target="_blank" rel="noreferrer">
           <FaLink />
         </a>
-        <button
-          className={styles.smallButton}
-          onClick={() => deleteFile(fileDetails.file_name)}
-        >
+        {/* <button className={styles.smallButton} onClick={deleteF}>
           <MdDeleteForever color="red" />
-        </button>
+        </button> */}
       </div>
     </li>
   );

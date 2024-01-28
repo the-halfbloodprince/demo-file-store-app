@@ -1,4 +1,4 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { User } from '@supabase/supabase-js';
 
 import { secrets } from '../config/secrets';
@@ -63,10 +63,20 @@ export const uploadFile = async (
 };
 
 // delete file
-export const deleteFile = async (fileName: string) => {
-  await deleteFileFromS3();
-  await deleteFileFromDB();
+export const deleteFile = async (fileDetails, user: User) => {
+  await deleteFileFromS3(fileDetails.file_name, user);
+  await deleteFileFromDB(fileDetails);
 };
 
-const deleteFileFromS3 = () => console.log('Delete file from s3 yet to be implemented');
-const deleteFileFromDB = () => console.log('Delete file from DB yet to be implemented');
+const deleteFileFromS3 = async (fileName: string, user: User) => {
+  console.log('Delete file from s3 yet to be implemented');
+  const deleteFileCommand = new DeleteObjectCommand({
+    Bucket: secrets.aws.bucketName,
+    Key: getS3FileName(fileName, user),
+  });
+  await services.s3.send(deleteFileCommand);
+};
+const deleteFileFromDB = (fileDetails) => {
+  console.log('Delete file from DB yet to be implemented');
+  services.supabase.from('files').delete().eq('id', fileDetails.id);
+};
